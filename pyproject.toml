@@ -7,7 +7,7 @@ name = "twamp-latency-lab"
 version = "0.1.0"
 description = "TWAMP-Light (RFC 5357) sender and reflector with one-way delay and clock-offset estimation"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Dehkontee Chea Cuppah" }]
 dependencies = []
