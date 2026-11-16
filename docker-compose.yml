@@ -1,0 +1,22 @@
+# Two containers on one bridge network, with artificial delay added by netem:
+#   sender    -> reflector : 20 ms (+/- 2 ms)   "forward"
+#   reflector -> sender    :  5 ms (+/- 1 ms)   "reverse"
+# The reflector's clock is also made 250 ms wrong and drifting, to show the estimator at work.
+services:
+  reflector:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    cap_add: [NET_ADMIN]
+    entrypoint: ["sh", "-c"]
+    command:
+      - tc qdisc add dev eth0 root netem delay 5ms 1ms &&
+        python -m twamplab.reflector --port 862 --clock-offset 0.25 --clock-drift-ppm 100
+  sender:
+    build: { context: ., dockerfile: docker/Dockerfile }
+    cap_add: [NET_ADMIN]
+    depends_on: [reflector]
+    volumes: ["./results:/results"]
+    entrypoint: ["sh", "-c"]
+    command:
+      - tc qdisc add dev eth0 root netem delay 20ms 2ms loss 1% &&
+        sleep 2 &&
+        python -m twamplab.sender reflector -c 600 -i 0.05 --csv /results/run.csv --json /results/run.json

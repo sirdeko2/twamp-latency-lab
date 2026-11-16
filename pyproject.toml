@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "twamp-latency-lab"
+version = "0.1.0"
+description = "TWAMP-Light (RFC 5357) sender and reflector with one-way delay and clock-offset estimation"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Dehkontee Chea Cuppah" }]
+dependencies = []
+
+[project.optional-dependencies]
+plot = ["matplotlib"]
+dev = ["pytest"]
+
+[project.scripts]
+twamp-reflector = "twamplab.reflector:main"
+twamp-sender = "twamplab.sender:main"
+twamp-plot = "twamplab.plot:main"
+
+[tool.setuptools]
+packages = ["twamplab"]
