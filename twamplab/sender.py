@@ -11,13 +11,14 @@ import sys
 import time
 
 from .analysis import Sample, build_report
-from .packets import ReflectorPacket, SenderPacket
+from .packets import ReflectorPacket, SenderPacket, error_estimate
 
 log = logging.getLogger("twamplab.sender")
 
 
 def run_session(host: str, port: int = 862, count: int = 100, interval: float = 0.1,
-                padding: int = 27, timeout: float = 2.0, dscp: int = 0) -> tuple[int, list[Sample]]:
+                padding: int = 27, timeout: float = 2.0, dscp: int = 0,
+                synced: bool = False) -> tuple[int, list[Sample]]:
     """Send ``count`` packets ``interval`` seconds apart; return (sent, samples)."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if dscp:
@@ -51,7 +52,7 @@ def run_session(host: str, port: int = 862, count: int = 100, interval: float = 
     try:
         for seq in range(count):
             drain(next_send)
-            pkt = SenderPacket(seq=seq, timestamp=time.time())
+            pkt = SenderPacket(seq=seq, timestamp=time.time(), error_estimate=error_estimate(synced))
             sock.sendto(pkt.pack(padding), dest)
             sent += 1
             next_send += interval
@@ -109,7 +110,8 @@ def main(argv=None) -> None:
     a = p.parse_args(argv)
     logging.basicConfig(level=logging.DEBUG if a.verbose else logging.WARNING)
 
-    sent, samples = run_session(a.host, a.port, a.count, a.interval, a.padding, a.timeout, a.dscp)
+    sent, samples = run_session(a.host, a.port, a.count, a.interval, a.padding, a.timeout, a.dscp,
+                                a.assume_synced)
     report = build_report(sent, samples, a.assume_synced)
     summary = report.summary()
     print_summary(summary)

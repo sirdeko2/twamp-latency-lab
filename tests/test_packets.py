@@ -1,6 +1,6 @@
 import time
 from twamplab.packets import (REFLECTOR_HEADER_LEN, SENDER_HEADER_LEN, ReflectorPacket,
-                              SenderPacket, from_ntp, to_ntp)
+                              SenderPacket, error_estimate, from_ntp, to_ntp)
 
 
 def test_header_sizes_match_rfc5357():
@@ -27,3 +27,9 @@ def test_reflector_roundtrip():
     q = ReflectorPacket.unpack(r.pack())
     assert (q.seq, q.sender_seq, q.sender_ttl) == (7, 42, 64)
     assert abs(q.receive_timestamp - r.receive_timestamp) < 1e-6
+
+
+def test_sync_flag_only_set_when_synced():
+    assert error_estimate(False) & 0x8000 == 0
+    assert error_estimate(True) & 0x8000
+    assert SenderPacket(seq=1, timestamp=0.0).error_estimate & 0x8000 == 0

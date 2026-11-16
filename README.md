@@ -69,7 +69,7 @@ Clock: reflector offset +258.059 ms at start, drift +103.9 ppm (119 low-RTT samp
 
 That is the injected 250 ms plus the expected 7.5 ms of asymmetry, and the injected 100 ppm of drift.
 
-**Demo flags on the reflector:** `--clock-offset SECONDS` and `--clock-drift-ppm PPM` make its clock wrong on purpose so you can watch the sender correct it.
+**Demo flags on the reflector:** `--clock-offset SECONDS` and `--clock-drift-ppm PPM` make its clock wrong on purpose so you can watch the sender correct it. `--synced` sets the S flag in its Error Estimate field; leave it off unless the reflector's clock is synced by PTP or GPS.
 
 ## Sender options
 
@@ -79,7 +79,7 @@ That is the injected 250 ms plus the expected 7.5 ms of asymmetry, and the injec
 | `-i, --interval` | seconds between packets (default 0.1) |
 | `--padding` | bytes of padding (default 27, keeps sender and reflector packets the same size) |
 | `--dscp` | DSCP marking for QoS tests |
-| `--assume-synced` | clocks are synced externally (PTP/GPS); skip offset estimation |
+| `--assume-synced` | clocks are synced externally (PTP/GPS); skip offset estimation and set the S (synchronized) flag in the Error Estimate field |
 | `--csv`, `--json` | save per-packet results and the summary |
 
 ## Project layout

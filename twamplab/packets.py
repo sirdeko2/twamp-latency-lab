@@ -9,7 +9,13 @@ import struct
 from dataclasses import dataclass
 
 NTP_EPOCH_OFFSET = 2208988800  # seconds between 1900-01-01 and 1970-01-01
-DEFAULT_ERROR_ESTIMATE = 0x8001  # S=1 (synchronized), scale 0, multiplier 1
+SYNC_BIT = 0x8000  # S flag: clock is synchronized to an external source (RFC 4656 sec 4.1.2)
+DEFAULT_ERROR_ESTIMATE = 0x0001  # S=0 (not synchronized), scale 0, multiplier 1
+
+
+def error_estimate(synced: bool = False) -> int:
+    """Error Estimate field: S set only when the clock really is externally synchronized."""
+    return DEFAULT_ERROR_ESTIMATE | (SYNC_BIT if synced else 0)
 
 # Sender: seq(4) timestamp(8) error(2)
 _SENDER = struct.Struct("!IQH")
